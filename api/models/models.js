@@ -15,6 +15,7 @@ models.PokemonMove = require('./pokemon-move')(envVars);
 models.PokemonTrainer = require('./pokemon-trainer')(envVars);
 models.PokemonType = require('./pokemon-type')(envVars);
 models.Region = require('./region')(envVars);
+models.Token = require('./token')(envVars);
 models.Trainer = require('./trainer')(envVars);
 models.Type = require('./type')(envVars);
 
