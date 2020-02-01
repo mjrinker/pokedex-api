@@ -1,8 +1,19 @@
 # Pokedex REST API
 
-## Step 0: Install Dependencies
+## Step 0: Install Dependencies and Set Up Repo
 
+* [Sublime Text 3](https://www.sublimetext.com/3) or other code text editor
+* [Postman](https://www.getpostman.com/downloads/) or other HTTP request client
+* [DB Browser for SQLite](https://sqlitebrowser.org/dl/) or other SQLite database browser
+* [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Sourcetree](https://www.sourcetreeapp.com/) or other git GUI
+* [GitHub Account](https://github.com/)
+* [NodeJS (version 10 or higher)](https://nodejs.org/en/download/)
 
+Once you have the above installed and have created a GitHub account, (fork)[https://help.github.com/en/github/getting-started-with-github/fork-a-repo] this (repository)[https://github.com/mjrinker/pokedex-api].
+Then in your (forked version)[https://help.github.com/en/github/getting-started-with-github/fork-a-repo] of this (repository)[https://github.com/mjrinker/pokedex-api], (clone)[https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository] your repository to your computer.
+
+Check out the branch `1_init`, which starts from the end of step 1. You can also just create a new repository on your computer and start following from step 1 below.
 
 ## Step 1: Initialize the API
 
