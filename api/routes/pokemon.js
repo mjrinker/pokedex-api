@@ -1,9 +1,10 @@
 const { envVars } = module.parent.exports; // import environment variables from parent
 const { app } = envVars; // extract app from environment variables
-const { models } = envVars; // extract app from environment variables
+const { models } = envVars; // extract models from environment variables
+const { middleware } = envVars; // extract middleware from environment variables
 
 // GET Pokemon endpoint
-app.get('/pokemon', async (req, res) => {
+app.get('/pokemon', middleware.auth.authenticateToken, async (req, res) => {
   const pokemon = await models.Pokemon.findAll({
     include: [
       {
@@ -41,7 +42,7 @@ app.get('/pokemon', async (req, res) => {
 });
 
 // POST Catch Pokemon endpoint
-app.post('/trainer/:trainerId/catch/:pokemonId', async (req, res) => {
+app.post('/trainer/:trainerId/catch/:pokemonId', middleware.auth.authenticateToken, async (req, res) => {
   // get the ids from the request path and body and query string
   const { trainerId, pokemonId } = req.params;
   const nickname = req.body.nickname || req.query.nickname || null;
@@ -86,7 +87,7 @@ app.post('/trainer/:trainerId/catch/:pokemonId', async (req, res) => {
 });
 
 // DELETE Release Pokemon endpoint
-app.delete('/trainer/:trainerId/release/:id', async (req, res) => {
+app.delete('/trainer/:trainerId/release/:id', middleware.auth.authenticateToken, async (req, res) => {
   // get the ids from the request path and body and query string
   const { trainerId, id } = req.params;
 
