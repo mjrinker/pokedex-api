@@ -31,6 +31,7 @@ models.Pokemon.hasMany(models.Evolution, { as: 'Evolutions', foreignKey: 'pokemo
 models.Pokemon.hasMany(models.Evolution, { as: 'Devolutions', foreignKey: 'evolutionId' });
 models.Pokemon.belongsToMany(models.Location, { as: 'Locations', through: 'pokemon_locations', foreignKey: 'pokemonId' });
 models.Pokemon.belongsToMany(models.Move, { as: 'Moves', through: 'pokemon_moves', foreignKey: 'pokemonId' });
+models.Pokemon.hasMany(models.PokemonTrainer, { as: 'PokemonTrainers', foreignKey: 'pokemonId' });
 models.Pokemon.belongsToMany(models.Type, { as: 'Types', through: 'pokemon_types', foreignKey: 'pokemonId' });
 models.Trainer.belongsToMany(models.Pokemon, { as: 'Pokemon', through: 'pokemon_trainers', foreignKey: 'trainerId' });
 models.Trainer.belongsTo(models.Location, { as: 'Hometown', foreignKey: 'hometownId' });
