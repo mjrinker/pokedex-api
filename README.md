@@ -10,8 +10,8 @@
 * [GitHub Account](https://github.com/)
 * [NodeJS (version 10 or higher)](https://nodejs.org/en/download/)
 
-Once you have the above installed and have created a GitHub account, (fork)[https://help.github.com/en/github/getting-started-with-github/fork-a-repo] this (repository)[https://github.com/mjrinker/pokedex-api].
-Then in your (forked version)[https://help.github.com/en/github/getting-started-with-github/fork-a-repo] of this (repository)[https://github.com/mjrinker/pokedex-api], (clone)[https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository] your repository to your computer.
+Once you have the above installed and have created a GitHub account, [fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) this [repository](https://github.com/mjrinker/pokedex-api).
+Then in your [forked version](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) of this [repository](https://github.com/mjrinker/pokedex-api), [clone](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) your repository to your computer.
 
 Check out the branch `1_init`, which starts from the end of step 1. You can also just create a new repository on your computer and start following from step 1 below.
 
