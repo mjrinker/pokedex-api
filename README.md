@@ -69,7 +69,7 @@ Create routes/test.js
 
 Move hello world route into test.js
 
-Add environment variables export to app.js (just below where `port` is declared):
+Add environment variables export to app.js (just after where `port` is declared):
 
 ```javascript
 // export environment variables
@@ -85,7 +85,7 @@ const { envVars } = module.parent.exports; // import environment variables from 
 const { app } = envVars; // extract app from environment variables
 ```
 
-Use the routes from routes/test.js in app.js (just below where you declared `module.exports.envVars`):
+Use the routes from routes/test.js in app.js (just after where you declared `module.exports.envVars`):
 
 ```javascript
 // include all the routes in routes/test.js
@@ -99,14 +99,25 @@ Restart the app and test the hello world route again to make sure it still works
 
 `npm install sequelize sqlite3 --save`
 
-Import Sequelize into app.js (at the top, under the express import):
+Import Sequelize into app.js (at the top, after the express import):
 
 ```javascript
 const Sequelize = require('sequelize'); // import sequelize (database ORM)
 
 ```
 
-Initialize Sequelize for use with SQLite database (just below where you declared `module.exports.envVars`):
+Add a `requires` key on `envVars` in app.js:
+
+```javascript
+module.exports.envVars = {
+  app,
+  requires: {
+  	Sequelize,
+  }
+};
+```
+
+Initialize Sequelize for use with SQLite database (just after where you declared `module.exports.envVars`):
 
 ```javascript
 // initialize sequelize
@@ -171,7 +182,7 @@ module.exports = (envVars) => {
 
 ```
 
-Import the Pokemon model just before the export in models/models.js:
+Import the Pokemon model into models/models.js (just after the export):
 
 ```javascript
 // import individual models
@@ -180,7 +191,7 @@ models.Pokemon = require('./pokemon')(envVars);
 
 Create models classes for the rest of the tables in the database and import them into models/models.js
 
-Add model associations (entity relationships) to models/models.js:
+Add model associations (entity relationships) to models/models.js (right after the individual model imports):
 
 ```javascript
 // create model associations
@@ -200,6 +211,14 @@ models.Pokemon.hasMany(models.PokemonTrainer, { as: 'PokemonTrainers', foreignKe
 models.Pokemon.belongsToMany(models.Type, { as: 'Types', through: 'pokemon_types', foreignKey: 'pokemonId' });
 models.Trainer.belongsToMany(models.Pokemon, { as: 'Pokemon', through: 'pokemon_trainers', foreignKey: 'trainerId' });
 models.Trainer.belongsTo(models.Location, { as: 'Hometown', foreignKey: 'hometownId' });
+```
+
+Import the models into app.js (after the sequelize init function):
+
+```javascript
+const models = require('./models/models');
+
+module.exports.envVars.models = models;
 ```
 
 Create routes/pokemon.js:
@@ -230,7 +249,7 @@ app.get('/pokemon', async (req, res) => {
 
 ```
 
-Import this file into app.js:
+Import this file into app.js (after the test route import):
 
 ```javascript
 require('./routes/pokemon');
@@ -246,13 +265,13 @@ Install body-parser
 
 `npm install body-parser --save`
 
-Add body-parser to app.js imports:
+Add body-parser to app.js imports (at the top):
 
 ```javascript
 const bodyParser = require('body-parser'); // import body-parser
 ```
 
-Use body-parser in app.js:
+Use body-parser in app.js (before the routes imports):
 
 ```javascript
 // use middleware
@@ -268,34 +287,34 @@ app.use((req, res, next) => {
 In the GET Pokemon endpoint in routes/pokemon.js, add a few more includes to the query:
 
 ```javascript
-      {
-        model: models.Evolution,
-        as: 'Evolutions',
-        include: [{
-          model: models.Pokemon,
-          as: 'EvolutionTargetPokemon',
-        }],
-      },
-      {
-        model: models.Evolution,
-        as: 'Devolutions',
-        include: [{
-          model: models.Pokemon,
-          as: 'EvolutionSourcePokemon',
-        }],
-      },
-      {
-        model: models.Location,
-        as: 'Locations',
-      },
-      {
-        model: models.Move,
-        as: 'Moves',
-      },
-      {
-        model: models.Type,
-        as: 'Types',
-      },
+{
+  model: models.Evolution,
+  as: 'Evolutions',
+  include: [{
+    model: models.Pokemon,
+    as: 'EvolutionTargetPokemon',
+  }],
+},
+{
+  model: models.Evolution,
+  as: 'Devolutions',
+  include: [{
+    model: models.Pokemon,
+    as: 'EvolutionSourcePokemon',
+  }],
+},
+{
+  model: models.Location,
+  as: 'Locations',
+},
+{
+  model: models.Move,
+  as: 'Moves',
+},
+{
+  model: models.Type,
+  as: 'Types',
+},
 ```
 
 ### POST Catch Pokemon
@@ -413,11 +432,11 @@ Test it and check the database to see if the data was added!
 
 This route is very similar to the POST Catch Pokemon route, but we need to change a few things.
 
-Change `post` to `delete` and `catch` to `release` in the route path:
+Change `post` to `delete` and `catch` to `release` in the route path, and `:pokemonId` to `:id`:
 
 ```javascript
 // DELETE Release Pokemon endpoint
-app.delete('/trainer/:trainerId/release/:pokemonId', async (req, res) => {
+app.delete('/trainer/:trainerId/release/:id', async (req, res) => {
 
 });
 ```
@@ -430,21 +449,23 @@ const { trainerId, id } = req.params;
 
 You can remove the `nickname` variable:
 
-```javascript
-~~const nickname = req.body.nickname || req.query.nickname || null;~~
+```diff
+- const nickname = req.body.nickname || req.query.nickname || null;
 ```
 
 As well as the query to the Pokemon model:
 
-```javascript
-~~// check if pokemon with pokemonId exists~~
-~~const pokemon = await models.Pokemon.findByPk(id);~~
+```diff
+- // check if pokemon with pokemonId exists
+- const pokemon = await models.Pokemon.findByPk(id);
 ```
 
 Also delete the `if (pokemon) {} else {}` statement:
 
+```diff
+- if (pokemon) {
+```
 ```javascript
-~~if (pokemon) {~~
   try {
     await models.PokemonTrainer.create({
       pokemonId,
@@ -462,16 +483,20 @@ Also delete the `if (pokemon) {} else {}` statement:
         error: err,
       });
   }
-~~} else {~~
-  ~~res.status(404)~~
-    ~~.send({~~
-      ~~message: 'Pokemon not found',~~
-    ~~});~~
-~~}~~
+```
+```diff
+- } else {
+-   res.status(404)
+-    .send({
+-       message: 'Pokemon not found',
+-     });
+- }
 ```
 
 OPTIONAL:
-If you still want to send the Pokemon's name as part of the response, you will need to get that data by querying the database:
+If you still want to send the Pokemon's name as part of the response, you will need to get that data by querying the database.
+
+To do so, put this query just before the `await models.PokemonTrainer.create({ ... });`:
 
 ```javascript
 const pokemon = await models.Pokemon.findOne({
@@ -491,7 +516,7 @@ Change `create` to `destroy` in the query call. This will soft-delete the record
 await models.PokemonTrainer.destroy({
 ```
 
-Wrap your query params in a `where` object and change the `pokemonId` param in the query call to `id`:
+Wrap your query params in a `where` object and change the `pokemonId` param in the query call to `id`, remove `nickname` and `seen`:
 
 ```javascript
 await models.PokemonTrainer.destroy({
@@ -507,6 +532,10 @@ Change you response messages to be more relevant to releasing a Pokemon:
 
 ```javascript
 res.send(`${trainer.name} released ${pokemon.name}! Bye ${pokemon.name}!`);
+
+// OR
+
+res.send(`${trainer.name} released a Pokemon! Bye!`);
 ```
 
 ```javascript
@@ -546,6 +575,8 @@ For `ACCESS_TOKEN_SECRET`, run the following in terminal:
 Copy the result in the value of `ACCESS_TOKEN_SECRET`
 
 Do the same for `REFRESH_TOKEN_SECRET`
+
+Type `.exit` in terminal to exit node.
 
 Create authServer.js:
 
@@ -863,13 +894,13 @@ module.exports.authenticateToken = (req, res, next) => {
 
 ```
 
-Import middleware/auth.js into app.js:
+Import middleware/auth.js into app.js (after the other middleware `app.use` statements):
 
 ```javascript
 module.exports.envVars.middleware = { auth: require('./middleware/auth') };
 ```
 
-Import dotenv and jwt packages into app.js:
+Import dotenv and jwt packages into app.js (at the top):
 
 ```javascript
 require('dotenv').config();
@@ -889,7 +920,7 @@ module.exports.envVars = {
 };
 ```
 
-To require authentication on an endpoint, first import middleware into the corresponding routes file:
+To require authentication on an endpoint, first import middleware into the corresponding routes file (at the top):
 
 ```javascript
 const { middleware } = envVars; // extract middleware from environment variables
@@ -901,7 +932,7 @@ Then, add `middleware.auth.authenticateToken` as the second param on the route d
 app.get('/pokemon', middleware.auth.authenticateToken, async (req, res) => {});
 ```
 
-Run the authServer through app.js:
+Run the authServer through app.js (at the bottom just before `app.listen`):
 
 ```javascript
 require('./authServer');
