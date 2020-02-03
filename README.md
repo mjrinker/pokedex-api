@@ -17,13 +17,19 @@ Check out the branch `1_init`, which starts from the end of step 1. You can also
 
 ## Step 1: Initialize the API
 
+Create a new folder where you will store this project or navigate to the directory where you cloned the repository.
+
+In terminal, navigate to this directory:
+
+`cd /path/to/your/project`
+
 Start a new Node project by typing this into terminal:
 
 `npm init`
 
 It will prompt you to enter different values. You can use the defaults for most of them except for this one:
 
-`entry point: app.js`
+`entry point: (index.js)` `app.js`
 
 Install Express.JS in terminal:
 
@@ -31,7 +37,7 @@ Install Express.JS in terminal:
 
 Create app.js:
 
-```
+```javascript
 const express = require('express'); // import express (rest api package)
 
 const app = express(); // initialize the express app
@@ -63,46 +69,46 @@ Create routes/test.js
 
 Move hello world route into test.js
 
-Add environment variables export to app.js:
+Add environment variables export to app.js (just below where `port` is declared):
 
-```
+```javascript
 // export environment variables
 module.exports.envVars = {
   app,
 };
 ```
 
-Import environment variables into routes/test.js:
+Import environment variables into routes/test.js (at the top):
 
-```
+```javascript
 const { envVars } = module.parent.exports; // import environment variables from parent
 const { app } = envVars; // extract app from environment variables
 ```
 
-Use the routes from routes/test.js in app.js:
+Use the routes from routes/test.js in app.js (just below where you declared `module.exports.envVars`):
 
-```
+```javascript
 // include all the routes in routes/test.js
 require('./routes/test');
 ```
 
+Restart the app and test the hello world route again to make sure it still works.
+
 
 ## Step 3: Get data from data source
 
-`npm install sequelize --save`
+`npm install sequelize sqlite3 --save`
 
-`npm install sqlite3 --save`
+Import Sequelize into app.js (at the top, under the express import):
 
-Import Sequelize into app.js:
-
-```
+```javascript
 const Sequelize = require('sequelize'); // import sequelize (database ORM)
 
 ```
 
-Initialize Sequelize for use with SQLite database:
+Initialize Sequelize for use with SQLite database (just below where you declared `module.exports.envVars`):
 
-```
+```javascript
 // initialize sequelize
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -117,7 +123,7 @@ Create models directory
 
 Create models/models.js:
 
-```
+```javascript
 const { envVars } = module.parent.exports; // import environment variables from parent
 
 const models = {};
@@ -128,7 +134,7 @@ module.exports = models;
 
 Create models/pokemon.js:
 
-```
+```javascript
 module.exports = (envVars) => {
   const { Sequelize, sequelize } = envVars.requires;
 
@@ -167,7 +173,7 @@ module.exports = (envVars) => {
 
 Import the Pokemon model just before the export in models/models.js:
 
-```
+```javascript
 // import individual models
 models.Pokemon = require('./pokemon')(envVars);
 ```
@@ -176,7 +182,7 @@ Create models classes for the rest of the tables in the database and import them
 
 Add model associations (entity relationships) to models/models.js:
 
-```
+```javascript
 // create model associations
 models.Evolution.belongsTo(models.EvolutionaryStone, { as: 'EvolutionaryStone', foreignKey: 'stoneId' });
 models.Evolution.belongsTo(models.Pokemon, { as: 'EvolutionSourcePokemon', foreignKey: 'pokemonId' });
@@ -198,7 +204,7 @@ models.Trainer.belongsTo(models.Location, { as: 'Hometown', foreignKey: 'hometow
 
 Create routes/pokemon.js:
 
-```
+```javascript
 const { envVars } = module.parent.exports; // import environment variables from parent
 const { app } = envVars; // extract app from environment variables
 const { models } = envVars; // extract app from environment variables
@@ -207,7 +213,7 @@ const { models } = envVars; // extract app from environment variables
 
 Add test pokemon route to routes/pokemon.js:
 
-```
+```javascript
 // GET Pokemon endpoint
 app.get('/pokemon', async (req, res) => {
   const pokemon = await models.Pokemon.findAll({
@@ -226,7 +232,7 @@ app.get('/pokemon', async (req, res) => {
 
 Import this file into app.js:
 
-```
+```javascript
 require('./routes/pokemon');
 ```
 
@@ -242,13 +248,13 @@ Install body-parser
 
 Add body-parser to app.js imports:
 
-```
+```javascript
 const bodyParser = require('body-parser'); // import body-parser
 ```
 
 Use body-parser in app.js:
 
-```
+```javascript
 // use middleware
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -261,7 +267,7 @@ app.use((req, res, next) => {
 
 In the GET Pokemon endpoint in routes/pokemon.js, add a few more includes to the query:
 
-```
+```javascript
       {
         model: models.Evolution,
         as: 'Evolutions',
@@ -296,7 +302,7 @@ In the GET Pokemon endpoint in routes/pokemon.js, add a few more includes to the
 
 Add a POST route for catching Pokemon:
 
-```
+```javascript
 // POST Catch Pokemon endpoint
 app.post('/trainer/:trainerId/catch/:pokemonId', async (req, res) => {
 
@@ -308,7 +314,7 @@ In this case, `trainerId` is the ID of the trainer who is catching the pokemon, 
 
 Parse the request path, body, and query string params in the POST Catch Pokemon endpoint:
 
-```
+```javascript
 // get the ids from the request path and body and query string
 const { trainerId, pokemonId } = req.params;
 const nickname = req.body.nickname || req.query.nickname || null;
@@ -316,21 +322,21 @@ const nickname = req.body.nickname || req.query.nickname || null;
 
 Find the trainer in the database using its [primary key] ID:
 
-```
+```javascript
 // check if trainer with trainerId exists
 const trainer = await models.Trainer.findByPk(trainerId);
 ```
 
 Do the same with the Pokemon:
 
-```
+```javascript
 // check if pokemon with pokemonId exists
 const pokemon = await models.Pokemon.findByPk(pokemonId);
 ```
 
 Add and if-else to check if the trainer with that ID exists, and another one for the Pokemon inside it:
 
-```
+```javascript
 if (trainer) {
   if (pokemon) {
 
@@ -344,7 +350,7 @@ if (trainer) {
 
 Inside the `if (pokemon) {}`, create a new record linking that Pokemon to the trainer:
 
-```
+```javascript
 await models.PokemonTrainer.create({
   pokemonId,
   trainerId,
@@ -356,13 +362,13 @@ await models.PokemonTrainer.create({
 
 Send a response saying that the trainer caught the Pokemon:
 
-```
+```javascript
 res.send(`${trainer.name} caught ${pokemon.name}!`);
 ```
 
 In the else block of the `if (pokemon) {}`, send an error response that the Pokemon was not found:
 
-```
+```javascript
 res.status(404)
   .send({
     message: 'Pokemon not found',
@@ -371,7 +377,7 @@ res.status(404)
 
 Do the same for the `if (trainer) {}` else block:
 
-```
+```javascript
 res.status(404)
   .send({
     message: 'Trainer not found',
@@ -380,7 +386,7 @@ res.status(404)
 
 Add a try-catch around the create PokemonTrainer call to catch any errors that might occur:
 
-```
+```javascript
 try {
   await models.PokemonTrainer.create({
     pokemonId,
@@ -409,7 +415,7 @@ This route is very similar to the POST Catch Pokemon route, but we need to chang
 
 Change `post` to `delete` and `catch` to `release` in the route path:
 
-```
+```javascript
 // DELETE Release Pokemon endpoint
 app.delete('/trainer/:trainerId/release/:pokemonId', async (req, res) => {
 
@@ -418,26 +424,26 @@ app.delete('/trainer/:trainerId/release/:pokemonId', async (req, res) => {
 
 Change `pokemonId` to `id`, as we will be using the primary key id on the pokemon_trainers table:
 
-```
+```javascript
 const { trainerId, id } = req.params;
 ```
 
 You can remove the `nickname` variable:
 
-```
+```javascript
 ~~const nickname = req.body.nickname || req.query.nickname || null;~~
 ```
 
 As well as the query to the Pokemon model:
 
-```
+```javascript
 ~~// check if pokemon with pokemonId exists~~
 ~~const pokemon = await models.Pokemon.findByPk(id);~~
 ```
 
 Also delete the `if (pokemon) {} else {}` statement:
 
-```
+```javascript
 ~~if (pokemon) {~~
   try {
     await models.PokemonTrainer.create({
@@ -467,7 +473,7 @@ Also delete the `if (pokemon) {} else {}` statement:
 OPTIONAL:
 If you still want to send the Pokemon's name as part of the response, you will need to get that data by querying the database:
 
-```
+```javascript
 const pokemon = await models.Pokemon.findOne({
   include: [{
     model: models.PokemonTrainer,
@@ -481,13 +487,13 @@ const pokemon = await models.Pokemon.findOne({
 
 Change `create` to `destroy` in the query call. This will soft-delete the record because we have `paranoid` set to `true` on the Model definition.
 
-```
+```javascript
 await models.PokemonTrainer.destroy({
 ```
 
 Wrap your query params in a `where` object and change the `pokemonId` param in the query call to `id`:
 
-```
+```javascript
 await models.PokemonTrainer.destroy({
   where: {
     id,
@@ -499,11 +505,11 @@ await models.PokemonTrainer.destroy({
 
 Change you response messages to be more relevant to releasing a Pokemon:
 
-```
+```javascript
 res.send(`${trainer.name} released ${pokemon.name}! Bye ${pokemon.name}!`);
 ```
 
-```
+```javascript
 res.status(500)
   .send({
     message: 'Unable to release Pokemon',
@@ -543,7 +549,7 @@ Do the same for `REFRESH_TOKEN_SECRET`
 
 Create authServer.js:
 
-```
+```javascript
 require('dotenv').config();
 
 const bcrypt = require('bcrypt');
@@ -601,7 +607,7 @@ authServer.listen(port, () => console.log(`Auth Server listening on port ${port}
 
 Create routes/auth.js:
 
-```
+```javascript
 const { envVars } = module.parent.exports; // import environment variables from parent
 const { authServer } = envVars; // extract app from environment variables
 const { models } = envVars; // extract app from environment variables
@@ -829,7 +835,7 @@ Create middleware directory.
 
 Create middleware/auth.js:
 
-```
+```javascript
 const { envVars } = module.parent.exports;
 const { jwt } = envVars.requires;
 
@@ -859,13 +865,13 @@ module.exports.authenticateToken = (req, res, next) => {
 
 Import middleware/auth.js into app.js:
 
-```
+```javascript
 module.exports.envVars.middleware = { auth: require('./middleware/auth') };
 ```
 
 Import dotenv and jwt packages into app.js:
 
-```
+```javascript
 require('dotenv').config();
 
 const jwt = require('jsonwebtoken'); // import jwt
@@ -873,7 +879,7 @@ const jwt = require('jsonwebtoken'); // import jwt
 
 Add jwt to envVars.requires in app.js:
 
-```
+```javascript
 module.exports.envVars = {
   app,
   requires: {
@@ -885,19 +891,19 @@ module.exports.envVars = {
 
 To require authentication on an endpoint, first import middleware into the corresponding routes file:
 
-```
+```javascript
 const { middleware } = envVars; // extract middleware from environment variables
 ```
 
 Then, add `middleware.auth.authenticateToken` as the second param on the route definition:
 
-```
+```javascript
 app.get('/pokemon', middleware.auth.authenticateToken, async (req, res) => {});
 ```
 
 Run the authServer through app.js:
 
-```
+```javascript
 require('./authServer');
 ```
 
