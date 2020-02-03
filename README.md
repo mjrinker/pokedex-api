@@ -530,6 +530,18 @@ await models.PokemonTrainer.destroy({
 +  },
 });
 ```
+The `destroy` call should now look like this:
+
+```javascript
+await models.PokemonTrainer.destroy({
+  where: {
+		id,
+		trainerId,
+		nickname,
+		seen: true,
+		caught: true,
+  },
+});
 
 Change you response messages to be more relevant to releasing a Pokemon:
 
