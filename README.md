@@ -430,7 +430,7 @@ Test it and check the database to see if the data was added!
 
 ### DELETE Release Pokemon
 
-This route is very similar to the POST Catch Pokemon route, but we need to change a few things.
+This route is very similar to the POST Catch Pokemon route so you can just make a copy of it. We will need to change a few things, though.
 
 Change `post` to `delete` and `catch` to `release` in the route path, and `:pokemonId` to `:id`:
 
@@ -518,13 +518,16 @@ await models.PokemonTrainer.destroy({
 
 Wrap your query params in a `where` object and change the `pokemonId` param in the query call to `id`, remove `nickname` and `seen`:
 
-```javascript
+```diff
 await models.PokemonTrainer.destroy({
-  where: {
-    id,
-    trainerId,
-    caught: true,
-  },
++  where: {
+-    pokemonId,
++    id,
+     trainerId,
+-    nickname,
+-    seen: true,
+     caught: true,
++  },
 });
 ```
 
@@ -533,7 +536,7 @@ Change you response messages to be more relevant to releasing a Pokemon:
 ```javascript
 res.send(`${trainer.name} released ${pokemon.name}! Bye ${pokemon.name}!`);
 
-// OR
+// OR (if you didn't do the optional Pokemon query above)
 
 res.send(`${trainer.name} released a Pokemon! Bye!`);
 ```
