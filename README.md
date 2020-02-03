@@ -544,7 +544,7 @@ await models.PokemonTrainer.destroy({
 });
 ```
 
-Change you response messages to be more relevant to releasing a Pokemon:
+Change your response messages to be more relevant to releasing a Pokemon:
 
 ```javascript
 res.send(`${trainer.name} released ${pokemon.name}! Bye ${pokemon.name}!`);
