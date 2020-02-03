@@ -542,6 +542,7 @@ await models.PokemonTrainer.destroy({
 		caught: true,
   },
 });
+```
 
 Change you response messages to be more relevant to releasing a Pokemon:
 
