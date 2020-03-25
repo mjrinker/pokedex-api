@@ -112,7 +112,7 @@ Add a `requires` key on `envVars` in app.js:
 module.exports.envVars = {
   app,
   requires: {
-  	Sequelize,
+    Sequelize,
   }
 };
 ```
@@ -359,9 +359,9 @@ Add and if-else to check if the trainer with that ID exists, and another one for
 if (trainer) {
   if (pokemon) {
 
-	} else {
+  } else {
 
-	}
+  }
 } else {
 
 }
@@ -535,11 +535,11 @@ The `destroy` call should now look like this:
 ```javascript
 await models.PokemonTrainer.destroy({
   where: {
-		id,
-		trainerId,
-		nickname,
-		seen: true,
-		caught: true,
+    id,
+    trainerId,
+    nickname,
+    seen: true,
+    caught: true,
   },
 });
 ```
