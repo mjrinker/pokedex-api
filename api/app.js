@@ -4,6 +4,7 @@ const bodyParser = require('body-parser'); // import body-parser
 const express = require('express'); // import express (rest api package)
 const jwt = require('jsonwebtoken'); // import jwt
 const Sequelize = require('sequelize'); // import sequelize (database ORM)
+const { spawn } = require('child_process'); // import child_process.spawn (to run authServer)
 
 const app = express(); // initialize the express app
 const port = 3000; // set the http port number
@@ -42,7 +43,14 @@ module.exports.envVars.middleware = { auth: require('./middleware/auth') };
 require('./routes/test');
 require('./routes/pokemon');
 
-require('./authServer');
+// run authServer
+const child = spawn('node', ['authServer.js']);
+child.stdout.on('data', (chunk) => {
+  fn.console.log('[AuthServer]', `${chunk}`.trim());
+});
+child.on('close', (code) => {
+  console.log(`AuthServer exited with code ${code}`);
+});
 
 // start the app listening on the specified port
 app.listen(port, () => console.log(`Pokedex API listening on port ${port}!`));
