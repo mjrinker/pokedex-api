@@ -948,10 +948,28 @@ Then, add `middleware.auth.authenticateToken` as the second param on the route d
 app.get('/pokemon', middleware.auth.authenticateToken, async (req, res) => {});
 ```
 
+Install child_process in terminal (this will allow us to start authServer directly from app.js):
+
+`npm install child_process --save`
+
+Import child_process.spawn into app.js (at the top, after the Sequelize import):
+
+```javascript
+const { spawn } = require('child_process'); // import child_process.spawn (to run authServer)
+
+```
+
 Run the authServer through app.js (at the bottom just before `app.listen`):
 
 ```javascript
-require('./authServer');
+// run authServer
+const child = spawn('node', ['authServer.js']);
+child.stdout.on('data', (chunk) => {
+  fn.console.log('[AuthServer]', `${chunk}`.trim());
+});
+child.on('close', (code) => {
+  console.log(`AuthServer exited with code ${code}`);
+});
 ```
 
 Now you can register, login, logout, and refresh your token by hitting the different auth routes. Remember to use port 4000 for these routes because that is what port the auth server is running on.
